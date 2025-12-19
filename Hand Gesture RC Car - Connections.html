@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)file:///C:/Users/acer/Downloads/connection_diagram.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Gesture RC Car - Connections</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .diagrams {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .diagrams {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .diagram-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .diagram-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        svg {
+            width: 100%;
+            height: auto;
+        }
+        
+        .component {
+            stroke: #333;
+            stroke-width: 2;
+        }
+        
+        .esp32 { fill: #4a90e2; }
+        .mpu6050 { fill: #50c878; }
+        .l298n { fill: #ff6b6b; }
+        .motor { fill: #ffd93d; }
+        .battery { fill: #a8e6cf; }
+        
+        .wire {
+            stroke-width: 3;
+            fill: none;
+        }
+        
+        .wire-red { stroke: #ff4444; }
+        .wire-black { stroke: #333333; }
+        .wire-blue { stroke: #4444ff; }
+        .wire-yellow { stroke: #ffdd44; }
+        .wire-green { stroke: #44ff44; }
+        .wire-orange { stroke: #ff8844; }
+        .wire-purple { stroke: #aa44ff; }
+        
+        text {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            fill: #333;
+        }
+        
+        .pin-label {
+            font-weight: bold;
+            font-size: 11px;
+        }
+        
+        .component-label {
+            font-weight: bold;
+            font-size: 16px;
+            fill: white;
+        }
+        
+        .legend {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .legend-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-line {
+            width: 40px;
+            height: 4px;
+            border-radius: 2px;
+        }
+        
+        .notes {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .notes-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .notes ul {
+            list-style-position: inside;
+            line-height: 1.8;
+        }
+        
+        .notes li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 Hand Gesture RC Car - Connection Diagrams</h1>
+        
+        <div class="diagrams">
+            <!-- Controller Diagram -->
+            <div class="diagram-card">
+                <div class="diagram-title">🎮 Controller Unit</div>
+                <svg viewBox="0 0 500 400">
+                    <!-- ESP32 -->
+                    <rect class="component esp32" x="200" y="150" width="100" height="120" rx="5"></rect>
+                    <text class="component-label" x="250" y="180" text-anchor="middle">ESP32</text>
+                    <text class="pin-label" x="195" y="195" text-anchor="end">3.3V</text>
+                    <text class="pin-label" x="195" y="210" text-anchor="end">GND</text>
+                    <text class="pin-label" x="195" y="225" text-anchor="end">GPIO21</text>
+                    <text class="pin-label" x="195" y="240" text-anchor="end">GPIO22</text>
+                    <text class="pin-label" x="305" y="195" text-anchor="start">VIN</text>
+                    <text class="pin-label" x="305" y="210" text-anchor="start">GND</text>
+                    
+                    <!-- MPU6050 -->
+                    <rect class="component mpu6050" x="30" y="150" width="100" height="100" rx="5"></rect>
+                    <text class="component-label" x="80" y="180" text-anchor="middle">MPU6050</text>
+                    <text class="pin-label" x="135" y="195" text-anchor="start">VCC</text>
+                    <text class="pin-label" x="135" y="210" text-anchor="start">GND</text>
+                    <text class="pin-label" x="135" y="225" text-anchor="start">SDA</text>
+                    <text class="pin-label" x="135" y="240" text-anchor="start">SCL</text>
+                    
+                    <!-- 9V Battery -->
+                    <rect class="component battery" x="350" y="170" width="80" height="60" rx="5"></rect>
+                    <text class="component-label" x="390" y="195" text-anchor="middle" fill="#333">9V</text>
+                    <text class="component-label" x="390" y="212" text-anchor="middle" fill="#333">Battery</text>
+                    <text class="pin-label" x="345" y="195" text-anchor="end">+</text>
+                    <text class="pin-label" x="345" y="215" text-anchor="end">-</text>
+                    
+                    <!-- Wires -->
+                    <!-- MPU6050 to ESP32 -->
+                    <path class="wire wire-red" d="M 130 192 L 200 192"></path>
+                    <path class="wire wire-black" d="M 130 207 L 200 207"></path>
+                    <path class="wire wire-blue" d="M 130 222 L 200 222"></path>
+                    <path class="wire wire-yellow" d="M 130 237 L 200 237"></path>
+                    
+                    <!-- Battery to ESP32 -->
+                    <path class="wire wire-red" d="M 350 192 L 300 192"></path>
+                    <path class="wire wire-black" d="M 350 207 L 300 207"></path>
+                    
+                    <!-- Labels -->
+                    <text x="250" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#667eea">Controller Connections</text>
+                    <text x="250" y="360" text-anchor="middle" font-size="12" fill="#666">Red=VCC | Black=GND | Blue=SDA | Yellow=SCL</text>
+                </svg>
+            </div>
+            
+            <!-- Car Diagram -->
+            <div class="diagram-card">
+                <div class="diagram-title">🚗 Car Unit</div>
+                <svg viewBox="0 0 600 500">
+                    <!-- ESP32 -->
+                    <rect class="component esp32" x="50" y="50" width="100" height="180" rx="5"></rect>
+                    <text class="component-label" x="100" y="80" text-anchor="middle">ESP32</text>
+                    <text class="pin-label" x="155" y="100" text-anchor="start">GPIO19</text>
+                    <text class="pin-label" x="155" y="120" text-anchor="start">GPIO21</text>
+                    <text class="pin-label" x="155" y="140" text-anchor="start">GPIO23</text>
+                    <text class="pin-label" x="155" y="160" text-anchor="start">GPIO4</text>
+                    <text class="pin-label" x="155" y="180" text-anchor="start">GPIO18</text>
+                    <text class="pin-label" x="155" y="200" text-anchor="start">GPIO22</text>
+                    <text class="pin-label" x="155" y="220" text-anchor="start">GND</text>
+                    
+                    <!-- L298N -->
+                    <rect class="component l298n" x="280" y="40" width="140" height="200" rx="5"></rect>
+                    <text class="component-label" x="350" y="70" text-anchor="middle">L298N</text>
+                    <text class="pin-label" x="275" y="100" text-anchor="end">IN1</text>
+                    <text class="pin-label" x="275" y="120" text-anchor="end">IN2</text>
+                    <text class="pin-label" x="275" y="140" text-anchor="end">IN3</text>
+                    <text class="pin-label" x="275" y="160" text-anchor="end">IN4</text>
+                    <text class="pin-label" x="275" y="180" text-anchor="end">ENA</text>
+                    <text class="pin-label" x="275" y="200" text-anchor="end">ENB</text>
+                    <text class="pin-label" x="275" y="220" text-anchor="end">GND</text>
+                    
+                    <text class="pin-label" x="425" y="100" text-anchor="start">OUT1</text>
+                    <text class="pin-label" x="425" y="120" text-anchor="start">OUT2</text>
+                    <text class="pin-label" x="425" y="160" text-anchor="start">OUT3</text>
+                    <text class="pin-label" x="425" y="180" text-anchor="start">OUT4</text>
+                    <text class="pin-label" x="350" y="250" text-anchor="middle">12V</text>
+                    
+                    <!-- Motors -->
+                    <rect class="component motor" x="480" y="70" width="80" height="50" rx="5"></rect>
+                    <text class="component-label" x="520" y="95" text-anchor="middle" fill="#333">Left</text>
+                    <text class="component-label" x="520" y="110" text-anchor="middle" fill="#333">Motor</text>
+                    <text class="pin-label" x="475" y="95" text-anchor="end">+</text>
+                    <text class="pin-label" x="475" y="110" text-anchor="end">-</text>
+                    
+                    <rect class="component motor" x="480" y="150" width="80" height="50" rx="5"></rect>
+                    <text class="component-label" x="520" y="175" text-anchor="middle" fill="#333">Right</text>
+                    <text class="component-label" x="520" y="190" text-anchor="middle" fill="#333">Motor</text>
+                    <text class="pin-label" x="475" y="175" text-anchor="end">+</text>
+                    <text class="pin-label" x="475" y="190" text-anchor="end">-</text>
+                    
+                    <!-- Battery -->
+                    <rect class="component battery" x="280" y="290" width="140" height="80" rx="5"></rect>
+                    <text class="component-label" x="350" y="320" text-anchor="middle" fill="#333">11.1V Battery</text>
+                    <text class="component-label" x="350" y="340" text-anchor="middle" fill="#333">(3x 3.7V)</text>
+                    <text class="pin-label" x="350" y="280" text-anchor="middle">+</text>
+                    <text class="pin-label" x="350" y="380" text-anchor="middle">-</text>
+                    
+                    <!-- Wires ESP32 to L298N -->
+                    <path class="wire wire-orange" d="M 150 97 L 275 97"></path>
+                    <path class="wire wire-purple" d="M 150 117 L 275 117"></path>
+                    <path class="wire wire-blue" d="M 150 137 L 275 137"></path>
+                    <path class="wire wire-green" d="M 150 157 L 275 157"></path>
+                    <path class="wire wire-yellow" d="M 150 177 L 275 177"></path>
+                    <path class="wire wire-red" d="M 150 197 L 275 197"></path>
+                    <path class="wire wire-black" d="M 150 217 L 275 217"></path>
+                    
+                    <!-- Wires L298N to Motors -->
+                    <path class="wire wire-red" d="M 420 97 L 480 92"></path>
+                    <path class="wire wire-black" d="M 420 117 L 480 107"></path>
+                    <path class="wire wire-red" d="M 420 157 L 480 172"></path>
+                    <path class="wire wire-black" d="M 420 177 L 480 187"></path>
+                    
+                    <!-- Battery to L298N -->
+                    <path class="wire wire-red" d="M 350 280 L 350 240"></path>
+                    <path class="wire wire-black" d="M 350 380 L 350 420 L 275 420 L 275 217"></path>
+                    
+                    <!-- Labels -->
+                    <text x="300" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#667eea">Car Connections</text>
+                    <text x="300" y="470" text-anchor="middle" font-size="11" fill="#666">Orange=IN1 | Purple=IN2 | Blue=IN3 | Green=IN4 | Yellow=ENA | Red=ENB</text>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Wire Color Legend -->
+        <div class="legend">
+            <div class="legend-title">Wire Color Guide</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #ff4444;"></div>
+                    <span>Red = Power (+) / VCC</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #333333;"></div>
+                    <span>Black = Ground (-) / GND</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #4444ff;"></div>
+                    <span>Blue = SDA / IN3</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #ffdd44;"></div>
+                    <span>Yellow = SCL / ENA</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #44ff44;"></div>
+                    <span>Green = IN4</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #ff8844;"></div>
+                    <span>Orange = IN1</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #aa44ff;"></div>
+                    <span>Purple = IN2</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Important Notes -->
+        <div class="notes">
+            <div class="notes-title">⚠️ Important Notes</div>
+            <ul>
+                <li><strong>MPU6050 VCC:</strong> Connect to ESP32 3.3V (NOT 5V!)</li>
+                <li><strong>Common Ground:</strong> All GND pins must be connected together</li>
+                <li><strong>L298N Jumpers:</strong> Remove ENA and ENB jumpers for PWM speed control</li>
+                <li><strong>Motor Power:</strong> 11.1V battery (3x 3.7V Li-Ion in series)</li>
+                <li><strong>Controller Power:</strong> 9V battery connected to ESP32 VIN</li>
+                <li><strong>Wire Gauge:</strong> Use 22-24 AWG for signals, 18-20 AWG for motor power</li>
+                <li><strong>Testing:</strong> Test with car elevated before ground operation</li>
+            </ul>
+        </div>
+    </div>
+
+</body></html>
