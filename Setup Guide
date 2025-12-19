@@ -1,0 +1,558 @@
+# Setup Guide - Hand Gesture RC Car
+
+Complete step-by-step guide to set up your Hand Gesture RC Car from scratch.
+
+##  Table of Contents
+1. Prerequisites
+2. Hardware Assembly
+3. Software Installation
+4. Code Upload Process
+5. Testing & Calibration
+6. First Run
+7. Troubleshooting
+
+---
+
+##  Prerequisites
+
+### What You'll Need
+
+**Hardware:**
+- Soldering iron and solder
+- Screwdrivers
+- USB cable for ESP32
+- Fully charged batteries
+
+**Software:**
+- Computer (Windows/Mac/Linux)
+- Arduino IDE
+- USB drivers for ESP32
+
+**Time Required:**
+- Hardware assembly = 2-3 hours
+- Software setup = 30 minutes
+- Testing and calibration = 30 minutes
+- **Total = 3-4 hours**
+
+---
+
+##  Hardware Assembly
+
+### Step 1: Prepare the Chassis
+
+1. Unpack the robot car chassis kit
+2. Attach motors to the chassis using provided screws
+3. Install wheels on motor shafts
+4. Mount battery holder to chassis base
+5. Ensure everything is secure and aligned
+
+**Tip:** Test motor rotation by connecting directly to battery before mounting.
+
+### Step 2: Build the Car Unit
+
+**Mount Components:**
+1. Attach L298N motor driver to chassis using double-sided tape or screws
+2. Mount ESP32 board near the motor driver
+3. Leave space for battery pack
+
+**Wire the Motors:**
+1. Connect Left Motor to L298N OUT1 and OUT2
+2. Connect Right Motor to L298N OUT3 and OUT4
+3. Secure wires with zip ties to prevent tangling
+
+**Power Connections:**
+1. Connect 11.1V battery pack to L298N 12V input
+2. **Important:** Verify polarity before connecting
+3. Connect common ground between L298N and ESP32
+
+**Signal Connections (refer to CONNECTIONS.md):**
+```
+L298N IN1 = ESP32 GPIO19
+L298N IN2 = ESP32 GPIO21
+L298N IN3 = ESP32 GPIO23
+L298N IN4 = ESP32 GPIO4
+L298N ENA = ESP32 GPIO18
+L298N ENB = ESP32 GPIO22
+L298N GND = ESP32 GND
+```
+
+**Important Checks:**
+- [ ] Remove ENA and ENB jumpers from L298N
+- [ ] All grounds connected together
+- [ ] Battery polarity correct
+- [ ] No short circuits
+- [ ] Wires secured and not touching wheels
+
+### Step 3: Build the Controller Unit
+
+**Mount Components:**
+1. Place ESP32 on breadboard or in project box
+2. Position MPU6050 near ESP32
+
+**Connections (refer to CONNECTIONS.md):**
+```
+MPU6050 VCC = ESP32 3.3V (NOT 5V!)
+MPU6050 GND = ESP32 GND
+MPU6050 SDA = ESP32 GPIO21
+MPU6050 SCL = ESP32 GPIO22
+```
+
+**Power:**
+```
+9V Battery (+) = ESP32 VIN
+9V Battery (-) = ESP32 GND
+```
+
+**Important Checks:**
+- [ ] MPU6050 connected to 3.3V (not 5V)
+- [ ] All connections secure
+- [ ] Battery polarity correct
+- [ ] Controller comfortable to hold
+
+### Step 4: Final Assembly Check
+
+Before proceeding, verify:
+- [ ] All connections match CONNECTIONS.md
+- [ ] No loose wires
+- [ ] No short circuits (check with multimeter)
+- [ ] Batteries installed correctly
+- [ ] All components securely mounted
+- [ ] Car wheels spin freely
+
+---
+
+##  Software Installation
+
+### Step 1: Install Arduino IDE
+
+1. Download Arduino IDE from [arduino.cc](https://www.arduino.cc/en/software)
+2. Choose version 1.8.19 or later
+3. Install following the installer instructions
+4. Launch Arduino IDE
+
+### Step 2: Install ESP32 Board Support
+
+1. Open Arduino IDE
+2. Go to **File → Preferences**
+3. In "Additional Board Manager URLs" field, add:
+   ```
+   https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+   ```
+4. Click **OK**
+5. Go to **Tools → Board → Boards Manager**
+6. Search for "ESP32"
+7. Install "ESP32 by Espressif Systems"
+8. Wait for installation to complete
+
+### Step 3: Install Required Libraries
+
+1. Go to **Sketch → Include Library → Manage Libraries**
+2. Search and install these libraries:
+   - **"MPU6050" by Electronic Cats** (or "Adafruit MPU6050")
+   - **Note:** WiFi.h and esp_now.h are built-in with ESP32
+
+3. Close Library Manager when done
+
+### Step 4: Configure Board Settings
+
+1. Go to **Tools → Board → ESP32 Arduino**
+2. Select **"ESP32 Dev Module"** (or your specific board)
+3. Set these parameters:
+   - Upload Speed = 921600
+   - CPU Frequency = 240MHz
+   - Flash Frequency = 80MHz
+   - Flash Mode = QIO
+   - Flash Size = 4MB
+   - Partition Scheme = Default
+   - Core Debug Level = None
+
+### Step 5: Install USB Drivers (if needed)
+
+**Windows:**
+- Most ESP32 boards use CP210x or CH340 drivers
+- Download from manufacturer website
+- Install and restart computer
+
+**Mac:**
+- Usually works automatically
+- If not, install CP210x drivers
+
+**Linux:**
+- Usually works out of the box
+- May need to add user to dialout group:
+  ```bash
+  sudo usermod -a -G dialout $USER
+  ```
+- Log out and log back in
+
+---
+
+##  Code Upload Process
+
+### Step 1: Get the Code
+
+1. Clone or download this repository
+2. Navigate to the code folder
+3. You should see two folders:
+   - `controller/` (transmitter)
+   - `car/` (receiver)
+
+### Step 2: Upload Car Code First
+
+**Why first?** We need the car's MAC address for the controller code.
+
+1. Connect Car's ESP32 to computer via USB
+2. Open `car/car.ino` in Arduino IDE
+3. Select correct **COM Port**: **Tools → Port → [Your ESP32 Port]**
+4. Click **Upload** button (→)
+5. Wait for "Done uploading" message
+6. Open **Serial Monitor** (Tools → Serial Monitor)
+7. Set baud rate to **115200**
+8. Press **Reset button** on ESP32
+9. **Copy the MAC address** shown (format: XX:XX:XX:XX:XX:XX)
+10. Save this MAC address - you'll need it!
+
+**Example Serial Output:**
+```
+ESP-NOW Gesture Car Controller Starting...
+My MAC Address: B0:A7:32:D8:A3:58
+Copy this MAC address to the MPU6500 sender code!
+```
+
+### Step 3: Update Controller Code
+
+1. Open `controller/controller.ino` in Arduino IDE
+2. Find this line near the top:
+   ```cpp
+   uint8_t receiverMAC[] = {0xB0, 0xA7, 0x32, 0xD8, 0xA3, 0x58};
+   ```
+3. Replace with YOUR car's MAC address
+4. Format: Each pair of hex digits separated by commas
+5. Example: If MAC is `AA:BB:CC:DD:EE:FF`, write:
+   ```cpp
+   uint8_t receiverMAC[] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
+   ```
+6. Save the file
+
+### Step 4: Upload Controller Code
+
+1. Disconnect car ESP32
+2. Connect Controller ESP32 to computer
+3. Select correct COM Port
+4. Click **Upload**
+5. Wait for "Done uploading"
+6. Open Serial Monitor (115200 baud)
+7. Press Reset button
+
+**You should see:**
+```
+=== MPU6500 Gesture Car Controller ===
+MPU6500 connected successfully!
+Calibrating MPU6500... Keep device level!
+Calibration complete!
+```
+
+---
+
+##  Testing & Calibration
+
+### Pre-Flight Checks
+
+Before powering on:
+- [ ] All connections verified
+- [ ] Batteries charged
+- [ ] Car wheels elevated (not on ground yet)
+- [ ] Clear workspace
+
+### Step 1: Controller Calibration
+
+1. Power on controller (9V battery)
+2. **Keep controller LEVEL on flat surface**
+3. Wait for calibration (takes 10 seconds)
+4. Serial monitor should show:
+   ```
+   Calibration complete!
+   Pitch offset: 0.X
+   Roll offset: 0.X
+   ```
+5. Don't move controller during calibration!
+
+### Step 2: Test Communication
+
+1. Power on car (11.1V battery)
+2. Both devices should connect automatically
+3. Controller Serial Monitor should show:
+   ```
+   ✓ Data sent successfully
+   ```
+4. If you see errors, check troubleshooting section
+
+### Step 3: Test Motors (Car Elevated)
+
+**Safety First:** Keep car elevated with wheels off the ground!
+
+1. Tilt controller forward gently
+2. Wheels should spin forward
+3. Tilt backward - wheels should reverse
+4. Tilt left - car should turn left
+5. Tilt right - car should turn right
+6. Keep level - wheels should stop
+
+**If motors don't respond:**
+- Check Serial Monitor for errors
+- Verify all connections
+- See troubleshooting section
+
+### Step 4: Fine-Tune Sensitivity
+
+If car is too sensitive or not sensitive enough:
+
+1. Open `controller/controller.ino`
+2. Find this line:
+   ```cpp
+   controlData.servo1 = constrain(map(pitch, -30, 30, 0, 180), 0, 180);
+   ```
+3. Change `-30, 30` values:
+   - Smaller values (e.g., `-20, 20`) = MORE sensitive
+   - Larger values (e.g., `-40, 40`) = LESS sensitive
+4. Same for servo2 (roll/turning)
+5. Re-upload and test
+
+### Step 5: Adjust Motor Speed
+
+If car is too fast or too slow:
+
+1. Open `car/car.ino`
+2. Find:
+   ```cpp
+   int baseSpeed = 180;
+   ```
+3. Change value:
+   - Lower (e.g., 150) = slower
+   - Higher (e.g., 220) = faster
+   - Maximum = 255
+4. Re-upload to car
+
+---
+
+##  First Run
+
+### Ground Test
+
+1. Place car on **smooth, flat surface**
+2. Clear area of obstacles (at least 3m x 3m)
+3. Power on both devices
+4. Wait for connection
+5. Start with GENTLE tilts
+6. Practice basic movements:
+   - Forward
+   - Backward
+   - Left turn
+   - Right turn
+   - Stop
+
+### Advanced Maneuvers
+
+Once comfortable:
+- Try diagonal movements (tilt forward + left)
+- Practice smooth transitions
+- Test turning radius
+- Experiment with different tilt angles
+
+### Tips for Better Control
+
+1. **Hold controller naturally** - like holding a phone
+2. **Start slow** - small tilts first
+3. **Smooth movements** - avoid jerky motions
+4. **Practice stopping** - level position
+5. **Line of sight** - keep car visible
+6. **Battery check** - weak battery = poor performance
+
+---
+
+##  Troubleshooting
+
+### Controller Issues
+
+**MPU6050 not detected:**
+```
+Solution:
+1. Check wiring (SDA, SCL, VCC, GND)
+2. Verify MPU6050 connected to 3.3V
+3. Try swapping SDA and SCL
+4. Test with I2C scanner sketch
+5. Check for cold solder joints
+```
+
+**Calibration fails:**
+```
+Solution:
+1. Keep controller perfectly level
+2. Place on stable surface
+3. Don't touch during calibration
+4. Restart and try again
+5. Check MPU6050 connection
+```
+
+**No data sending:**
+```
+Solution:
+1. Verify MAC address in code
+2. Check Serial Monitor messages
+3. Ensure car is powered on
+4. Try resetting both devices
+5. Re-upload car code and get fresh MAC
+```
+
+### Car Issues
+
+**Motors not running:**
+```
+Solution:
+1. Check battery voltage (should be >10V)
+2. Verify L298N connections
+3. Test motors directly with battery
+4. Check ENA/ENB jumpers removed
+5. Verify GPIO pin connections
+6. Check for loose wires
+```
+
+**Car moves in wrong direction:**
+```
+Solution:
+1. Swap motor wires (change polarity)
+2. Or modify code to reverse direction
+3. Adjust in moveForward() function
+```
+
+**One motor not working:**
+```
+Solution:
+1. Test motor separately
+2. Check motor driver connections for that channel
+3. Verify GPIO pin connections
+4. Test with different motor
+5. L298N channel might be damaged
+```
+
+**Weak/slow motors:**
+```
+Solution:
+1. Charge battery fully
+2. Check wire gauge (use thicker wires)
+3. Increase baseSpeed in code
+4. Check for loose connections
+5. Motors might need more voltage
+```
+
+### Communication Issues
+
+**"Peer not found" error:**
+```
+Solution:
+1. Verify MAC address is correct
+2. Format: {0xAA, 0xBB, 0xCC, ...}
+3. Re-upload car code and get fresh MAC
+4. Ensure both on same WiFi channel
+5. Try resetting both ESP32s
+```
+
+**Intermittent connection:**
+```
+Solution:
+1. Check power supply stability
+2. Add capacitors across battery
+3. Reduce distance between devices
+4. Avoid WiFi interference
+5. Check antenna orientation
+```
+
+**ESP-NOW init failed:**
+```
+Solution:
+1. Re-upload code
+2. Check ESP32 board selection
+3. Try different USB cable
+4. Update ESP32 board package
+5. Factory reset ESP32
+```
+
+### General Issues
+
+**Serial Monitor shows gibberish:**
+```
+Solution:
+1. Set baud rate to 115200
+2. Check COM port selection
+3. Press Reset on ESP32
+4. Try different USB cable
+```
+
+**Upload fails:**
+```
+Solution:
+1. Hold BOOT button while uploading
+2. Check driver installation
+3. Try lower upload speed (115200)
+4. Use different USB cable
+5. Check COM port in Device Manager
+```
+
+**Car behavior erratic:**
+```
+Solution:
+1. Recalibrate MPU6050
+2. Check battery voltage
+3. Add delays in code
+4. Check for electromagnetic interference
+5. Add capacitors to motors (100nF)
+```
+
+---
+
+##  Getting More Help
+
+If you're still stuck:
+
+1. **Check Serial Monitor** - error messages are helpful
+2. **Review CONNECTIONS.md** - verify all wiring
+3. **Test components individually** - isolate the problem
+4. **Search error messages** - Google is your friend
+5. **Open GitHub issue** - provide details:
+   - What you tried
+   - Error messages
+   - Serial Monitor output
+   - Photos of setup
+or simply you can mail me varungoel19006@gamil.com
+
+---
+
+##  Success Checklist
+
+You're ready when:
+- [ ] Both ESP32s power on
+- [ ] Serial Monitor shows no errors
+- [ ] MPU6050 calibrates successfully
+- [ ] Car responds to gestures
+- [ ] All movements work correctly
+- [ ] Emergency stop works (level position)
+- [ ] Comfortable with controls
+
+---
+
+## 🎉 Congratulations!
+
+You've successfully built and configured your Hand Gesture RC Car!
+
+**Next Steps:**
+- Show off to friends and family
+- Record a demo video
+- Experiment with modifications
+- Share your build on social media
+- Consider adding new features (see README.md)
+
+**Have fun and drive safely!** 
+
+---
+
+**Created by:** Varun Goel  
