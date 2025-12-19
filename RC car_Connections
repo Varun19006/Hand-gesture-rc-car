@@ -1,0 +1,236 @@
+# Hardware Connections Guide
+
+This guide provides detailed wiring instructions for the Hand Gesture RC Car project.
+
+## Table of Contents
+- Controller Unit Connections
+- Car Unit Connections
+- Power Supply Specifications
+- Wiring Tips
+- Troubleshooting
+
+
+
+## 🎮 Controller Unit Connections
+
+### MPU6050 to ESP32
+
+MPU6050 VCC = ESP32 3.3V (Red wire recommended)
+MPU6050 GND = ESP32 GND (Black wire recommended)
+MPU6050 SDA = ESP32 GPIO 21 (Blue/Green wire recommended)
+MPU6050 SCL = ESP32 GPIO 22 (Yellow/White wire recommended)
+
+### Power Connections
+
+9V Battery (+) = ESP32 VIN
+9V Battery (-) = ESP32 GND
+
+**Important Notes:**
+- The MPU6050 operates at **3.3V**, not 5V
+- Connect MPU6050 VCC to ESP32's 3.3V pin
+- ESP32 can be powered through VIN with 9V battery
+- Make sure all grounds are connected together (common ground)
+
+---
+
+## 🚗 Car Unit Connections
+
+### L298N Motor Driver to ESP32
+
+L298N IN1 = ESP32 GPIO 19 (Motor A Direction 1)
+L298N IN2 = ESP32 GPIO 21 (Motor A Direction 2)
+L298N IN3 = ESP32 GPIO 23 (Motor B Direction 1)
+L298N IN4 = ESP32 GPIO 4 (Motor B Direction 2)
+L298N ENA = ESP32 GPIO 18 (Motor A Speed PWM)
+L298N ENB = ESP32 GPIO 22 (Motor B Speed PWM)
+L298N GND = ESP32 GND (Common Ground)
+
+### L298N to Motors
+
+L298N OUT1 = Left Motor (+)
+L298N OUT2 = Left Motor (-)
+L298N OUT3 = Right Motor (+)
+L298N OUT4 = Right Motor (-)
+
+### L298N Power Connections
+
+L298N 12V = 11.1V Battery Pack (+) [3x 3.7V Li-Ion in series]
+L298N GND = Battery Pack (-) [Common ground with ESP32]
+L298N 5V = ESP32 VIN (optional, if using L298N's 5V regulator)
+
+**Important Notes:**
+- Remove the 5V jumper on L298N if powering ESP32 separately
+- Keep the jumper if using L298N's 5V regulator to power ESP32
+- ENA and ENB jumpers should be **removed** for PWM speed control
+- Connect ENA and ENB to ESP32 GPIO pins for speed control
+
+---
+
+## 🔋 Power Supply Specifications
+
+### Controller Unit
+ESP32 Power = 9V battery (connected to VIN)
+MPU6050 Power = ESP32's 3.3V regulator
+Current Draw = ~100-150mA during operation
+
+### Car Unit
+Motors Power = 11.1V (3x 3.7V Li-Ion batteries in series)
+ESP32 Power = Either from L298N's 5V output or separate power
+Motor Current = Depends on motors (typically 500mA - 2A per motor)
+Total Current = 1A - 4A under load
+
+### Battery Recommendations
+Controller = Standard 9V alkaline or rechargeable battery
+Car = 3x 18650 Li-Ion cells (3.7V each) with protection circuit
+Capacity = Minimum 2000mAh for decent runtime
+
+---
+
+## 🔧 Wiring Tips
+
+### General Guidelines
+
+**Wire Gauge:**
+- Signal wires (GPIO) = 22-24 AWG
+- Motor power = 18-20 AWG minimum
+
+**Color Coding (recommended):**
+- Red = Power (+)
+- Black = Ground (-)
+- Other colors = Signal wires
+
+**Secure Connections:**
+- Solder connections for reliability
+- Use heat shrink tubing for insulation
+- Avoid loose wires that can short circuit
+- All components must share a common ground
+- ESP32 GND, L298N GND, and battery GND must be connected
+
+### Breadboard vs Soldering
+Testing = Use breadboard with jumper wires
+Final build = Solder connections for durability
+Alternative = Use a perfboard or PCB for clean assembly
+
+---
+
+## 🔍 Troubleshooting
+
+### Controller Issues
+
+**MPU6050 not detected:**
+- Check I2C connections (SDA and SCL)
+- Verify 3.3V power supply
+- Try swapping SDA and SCL if still not working
+- Test with I2C scanner sketch
+
+**ESP32 not powering on:**
+- Check 9V battery voltage (should be >7V)
+- Verify polarity of battery connection
+- Check for short circuits
+
+### Car Issues
+
+**Motors not running:**
+- Verify L298N power (11.1V battery)
+- Check all motor driver connections
+- Test motors directly with battery
+- Ensure ENA/ENB jumpers are removed
+
+**One motor not working:**
+- Check specific motor connections
+- Verify GPIO pin connections for that motor
+- Test motor driver channels individually
+
+**Weak motor performance:**
+- Check battery voltage (should be >10V)
+- Verify wire gauge is adequate
+- Check for loose connections
+- Battery might need charging
+
+**ESP32 not receiving data:**
+- Verify MAC address in controller code
+- Check Serial Monitor for connection status
+- Ensure both ESP32s are powered on
+- Try resetting both devices
+
+### General Issues
+
+**No communication between devices:**
+- Verify MAC address is correct
+- Check ESP-NOW initialization messages
+- Ensure both devices are on same WiFi channel (1)
+- Try uploading code again
+
+**Erratic behavior:**
+- Calibrate MPU6050 (keep level during startup)
+- Check for loose connections
+- Verify power supply stability
+- Add capacitors across motor terminals (100nF - 1µF)
+
+---
+
+## 📐 Wiring Diagram Reference
+
+### Controller Unit Wiring:
+```
+ESP32 3.3V -----> MPU6050 VCC
+ESP32 GND  -----> MPU6050 GND
+ESP32 GPIO21 ---> MPU6050 SDA
+ESP32 GPIO22 ---> MPU6050 SCL
+ESP32 VIN  -----> 9V Battery (+)
+ESP32 GND  -----> 9V Battery (-)
+```
+
+### Car Unit Wiring:
+```
+ESP32 GPIO19 ---> L298N IN1
+ESP32 GPIO21 ---> L298N IN2
+ESP32 GPIO23 ---> L298N IN3
+ESP32 GPIO4  ---> L298N IN4
+ESP32 GPIO18 ---> L298N ENA
+ESP32 GPIO22 ---> L298N ENB
+ESP32 GND    ---> L298N GND
+
+L298N OUT1 -----> Left Motor (+)
+L298N OUT2 -----> Left Motor (-)
+L298N OUT3 -----> Right Motor (+)
+L298N OUT4 -----> Right Motor (-)
+
+L298N 12V  -----> 11.1V Battery (+)
+L298N GND  -----> 11.1V Battery (-)
+```
+
+---
+
+## ⚡ Quick Setup Checklist
+
+**Before powering on:**
+- [ ] All connections are secure and soldered
+- [ ] No exposed wires or short circuits
+- [ ] Common ground connected between all components
+- [ ] Battery polarity is correct
+- [ ] MPU6050 connected to 3.3V (NOT 5V)
+- [ ] L298N ENA/ENB jumpers removed
+- [ ] Motor connections are correct
+- [ ] Code uploaded to both ESP32s
+- [ ] MAC address updated in controller code
+
+**Testing sequence:**
+1. Power on controller ESP32 and check Serial Monitor
+2. Verify MPU6050 initialization and calibration
+3. Power on car ESP32 and note MAC address
+4. Update MAC address in controller code if needed
+5. Test gesture control with car elevated (wheels off ground)
+6. Place car on ground and test full operation
+
+---
+
+##  Need Help?
+
+If you encounter issues not covered here:
+- Check Serial Monitor output for error messages
+- Verify all connections against this guide
+- Test components individually
+- Open an issue on GitHub with details
+
+**Created by:** Varun Goel
